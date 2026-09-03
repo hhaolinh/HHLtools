@@ -18,17 +18,3 @@
 编号 = ord
 保留小数 = round
 求和 = sum
-
-
-
-class IO:
-    def __init__(self):
-        pass
-    def __lshift__(self, other):
-        print(other)
-
-cout = IO()
-
-
-
-

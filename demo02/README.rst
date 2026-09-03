@@ -40,4 +40,7 @@ HHLTools
 2026/9/3
     | 1.2.7 fix bugs
 
+2026/9/4
+    | 2.0.0 COMPLETELY UPGRADED! Added some debug tools and documentations/annoations
+
 

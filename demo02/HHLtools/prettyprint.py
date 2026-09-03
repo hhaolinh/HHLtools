@@ -1,6 +1,3 @@
-from HHLtools.Herror import *
-
-
 class FontStyle:
     DEFAULT = 0
     BOLD = 1
@@ -32,7 +29,14 @@ class BackgroundColor:
     WHITE = 47
 
 
-def prints(content, fontStyle=None, fontColor=None, backgroundColor=None):
+class TreeConnectors:
+    LONG = "├── "
+    SHORT = "└── "
+    STRAIGHT = "│   "
+    CONTINUATION = "    "
+
+
+def prints(content, *args, fontStyle=None, fontColor=None, backgroundColor=None, **kwargs):
     codes = []
     if fontStyle is not None and fontStyle != 0:
         codes.append(str(fontStyle))
@@ -40,4 +44,4 @@ def prints(content, fontStyle=None, fontColor=None, backgroundColor=None):
         codes.append(str(fontColor))
     if backgroundColor is not None:
         codes.append(str(backgroundColor))
-    print(f"\033[{';'.join(codes)}m{content}\033[0m")
+    print(f"\033[{';'.join(codes)}m{content}\033[0m", *args, **kwargs)

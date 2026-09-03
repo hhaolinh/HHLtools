@@ -3,9 +3,9 @@ import setuptools
 
 setuptools.setup(
     name='hhltools',
-    version='1.2.7',
+    version='2.0.0',
     keywords='HHLtools',
-    description='A tool for CAIE 9618 learner, and some math function',
+    description='A collection of handy Python tools',
     long_description=open(
         os.path.join(
             os.path.dirname(__file__),
@@ -20,11 +20,6 @@ setuptools.setup(
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
-        'Natural Language :: Chinese (Simplified)',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',

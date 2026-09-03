@@ -1,18 +1,14 @@
 """
-HHLtools
+A collection of handy Python utilities.
 
-DESCRIPTION
-===================================================
-Noting here, but you can import my sub-packages
+**Modules**
 
-ADT: support some abstract data types
-CN: support some Chinese keywords
-Herror: some of my custom errors
-Hmath: some math functions
-prints: support print with different styles
-===================================================
+- ``algorithm`` — Basic algorithms.
+- ``chinese`` — Chinese keywords, just for fun.
+- ``data_structure`` — Data structures.
+- ``debug`` — Debugging utilities.
+- ``error`` — Exceptions and error-handling utilities.
+- ``math`` — Mathematical utilities.
+- ``prettyprint`` — Pretty-printing utilities.
+- ``utils`` — utilities.
 """
-
-
-
-
