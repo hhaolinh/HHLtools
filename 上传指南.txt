@@ -1,0 +1,16 @@
+python3.11 setup.py check
+python3.11 setup.py bdist_wheel --universal
+python3.11 -m twine upload dist/*
+
+引入静态文件
+(setup.py) include_package_data=True
+(MANIFEST.in) include data/Template.xlsx
+
+获取路径
+base = os.path.dirname(os.path.abspath(__file__))
+
+依赖库
+(setup.py) install_requires=[]
+
+更新:
+python3.11 -m pip install --user --upgrade HHLtools
