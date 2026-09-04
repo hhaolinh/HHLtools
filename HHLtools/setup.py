@@ -1,0 +1,32 @@
+import os
+import setuptools
+
+setuptools.setup(
+    name='hhltools',
+    version='2.0.0',
+    keywords='HHLtools',
+    description='A collection of handy Python tools',
+    long_description=open(
+        os.path.join(
+            os.path.dirname(__file__),
+            'README.rst'
+        )
+    ).read(),
+    author='hhaolin',
+    author_email='2813579566@qq.com',
+    packages=setuptools.find_packages(),
+    license='MIT',
+    platforms=["all"],
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
+        'Topic :: Software Development :: Libraries'
+    ],
+)
