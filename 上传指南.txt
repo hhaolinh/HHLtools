@@ -1,5 +1,9 @@
 python3.11 setup.py check
 python3.11 setup.py bdist_wheel --universal
+ OR
+python3.11 -m build
+python3.11 -m twine check dist/*
+
 python3.11 -m twine upload dist/*
 
 引入静态文件

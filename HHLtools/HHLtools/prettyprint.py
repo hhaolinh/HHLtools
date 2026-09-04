@@ -34,6 +34,7 @@ class TreeConnectors:
     SHORT = "└── "
     STRAIGHT = "│   "
     CONTINUATION = "    "
+    RECURSION = "↻ "
 
 
 def prints(content, *args, fontStyle=None, fontColor=None, backgroundColor=None, **kwargs):
