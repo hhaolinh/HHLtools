@@ -1,5 +1,6 @@
 import inspect
 import traceback
+from functools import wraps
 from sys import getrecursionlimit
 from typing import ParamSpec, TypeVar, Callable, Any
 from .error import raise_error
@@ -26,7 +27,7 @@ def callingStack(depth: int = None):
         depth = float("inf")
 
     def inner(f: Callable[P, R]) -> Callable[P, R]:
-
+        @wraps(f)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             ret = None
             try:
@@ -76,7 +77,7 @@ def _printObj(obj: object, prefix: str = "", children_prefix: str = "", name: st
               depth: int = 0) -> None:
     print(prefix, end="")
     attributes = _getattrs(obj)
-    if attributes is None:
+    if attributes is None or not attributes:
         print(repr(obj) if name is None else f"{name} = {obj!r}")
         return
 

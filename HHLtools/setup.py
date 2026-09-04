@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name='hhltools',
-    version='2.0.0',
+    version='2.0.1',
     keywords='HHLtools',
     description='A collection of handy Python tools',
     long_description=open(
