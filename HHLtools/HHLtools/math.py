@@ -1,5 +1,5 @@
 from .error import raise_error, DimensionError
-from .utils import getType
+from .utils import get_type_name
 
 
 class Function:
@@ -10,9 +10,9 @@ class Function:
         :param variable: The name of the variable
         """
         if type(expression) is not str:
-            raise_error(TypeError, f"the expression must be a string, not {getType(expression)}")
+            raise_error(TypeError, f"the expression must be a string, not {get_type_name(expression)}")
         if type(variable) is not str:
-            raise_error(TypeError, f"the variable must be a string, not {getType(expression)}")
+            raise_error(TypeError, f"the variable must be a string, not {get_type_name(expression)}")
         self.__expression = expression
         self.__var = variable
 
@@ -23,7 +23,7 @@ class Function:
         :return: THe result
         """
         if type(value) not in (int, float):
-            raise_error(TypeError, f"the value must be an integer, or a real number, not {getType(value)}")
+            raise_error(TypeError, f"the value must be an integer, or a real number, not {get_type_name(value)}")
         expression = self.__expression.replace(self.__var, str(value))
         return eval(expression)
 
@@ -35,9 +35,9 @@ class Function:
         :return:
         """
         if type(value) not in (int, float):
-            raise_error(TypeError, f"the value must be an integer, or a real number, not {getType(value)}")
+            raise_error(TypeError, f"the value must be an integer, or a real number, not {get_type_name(value)}")
         if type(accuracy) is not float:
-            raise_error(TypeError, f"the acuuracy must be a real number, not {getType(value)}")
+            raise_error(TypeError, f"the acuuracy must be a real number, not {get_type_name(value)}")
         x1 = value
         x2 = value + 10 ** -accuracy
         y1 = self.evaluate(x1)
@@ -64,12 +64,12 @@ class Vector:
 
     def __eq__(self, other: "Vector"):
         if not isinstance(other, Vector):
-            raise_error(TypeError, f"unsupported operand type(s) for =: 'Vector' and {getType(other)}")
+            raise_error(TypeError, f"unsupported operand type(s) for =: 'Vector' and {get_type_name(other)}")
         return self.dimensions == other.dimensions
 
     def __add__(self, other: "Vector") -> "Vector":
         if not isinstance(other, Vector):
-            raise_error(TypeError, f"unsupported operand type(s) for +: 'Vector' and {getType(other)}")
+            raise_error(TypeError, f"unsupported operand type(s) for +: 'Vector' and {get_type_name(other)}")
         if len(self) is not len(other):
             raise_error(DimensionError, f'unsupported operand dimension(s) for +: Vectors of different dimensions')
         res = [self.dimensions[i] + other.dimensions[i] for i in range(len(self))]
@@ -77,7 +77,7 @@ class Vector:
 
     def __sub__(self, other: "Vector") -> "Vector":
         if not isinstance(other, Vector):
-            raise_error(TypeError, f"unsupported operand type(s) for -: 'Vector' and {getType(other)}")
+            raise_error(TypeError, f"unsupported operand type(s) for -: 'Vector' and {get_type_name(other)}")
         if len(self) != len(other):
             raise_error(DimensionError, f"unsupported operand dimension(s) for -: Vectors of different dimensions")
         res = [self.dimensions[i] - other.dimensions[i] for i in range(len(self))]
@@ -91,7 +91,7 @@ class Vector:
                 raise_error(DimensionError, f"unsupported operand dimension(s) for *: Vectors of different dimensions")
             return sum([self.dimensions[i] * other.dimensions[i] for i in range(len(self))])
         else:
-            raise_error(TypeError, f"unsupported operand type(s) for *: 'Vector' and {getType(other)}")
+            raise_error(TypeError, f"unsupported operand type(s) for *: 'Vector' and {get_type_name(other)}")
 
     def __rmul__(self, other: "Vector" | int) -> "Vector" | int:
         if isinstance(other, int):
@@ -101,14 +101,14 @@ class Vector:
                 raise_error(DimensionError, f"unsupported operand dimension(s) for *: Vectors of different dimensions")
             return sum([self.dimensions[i] * other.dimensions[i] for i in range(len(self))])
         else:
-            raise_error(TypeError, f"unsupported operand type(s) for *: {getType(other)} and 'Vector'")
+            raise_error(TypeError, f"unsupported operand type(s) for *: {get_type_name(other)} and 'Vector'")
 
     def __abs__(self) -> int:
         return sum([i ** 2 for i in self.dimensions]) ** (1 / 2)
 
     def __matmul__(self, other: "Vector") -> "Vector":
         if not isinstance(other, Vector):
-            raise_error(TypeError, f"unsupported operand type(s) for @: 'Vector' and {getType(other)}")
+            raise_error(TypeError, f"unsupported operand type(s) for @: 'Vector' and {get_type_name(other)}")
         if len(self.dimensions) != 3 or len(other.dimensions) != 3:
             raise_error(DimensionError, f"unsupported operand dimension(s) for @: Not 3 dimension Vector(s)")
         x = self.dimensions[1] * other.dimensions[2] - self.dimensions[2] * other.dimensions[1]

@@ -5,7 +5,7 @@ from sys import getrecursionlimit
 from typing import ParamSpec, TypeVar, Callable, Any
 from .error import raise_error
 from .prettyprint import prints, FontColor, FontStyle, TreeConnectors
-from .utils import getType
+from .utils import get_type_name
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -21,7 +21,7 @@ def calling_stack(depth: int = None):
         return calling_stack()(depth)
 
     if depth is not None and type(depth) is not int:
-        raise_error(TypeError, f"callingStack() takes integer argument(s) but {getType(depth)} was given")
+        raise_error(TypeError, f"callingStack() takes integer argument(s) but {get_type_name(depth)} was given")
 
     if depth is None or depth < 0:
         depth = float("inf")
@@ -70,7 +70,7 @@ def print_obj(obj: object, depth: int | None = None) -> None:
     if depth <= 0:
         print(obj)
         return
-    print(_format_obj(obj, depth=depth))
+    print(_format_obj(obj, depth=depth).removesuffix("\n"))
 
 
 def _format_obj(obj: object, prefix: str = "", children_prefix: str = "", name: str | None = None,
@@ -91,7 +91,7 @@ def _format_obj(obj: object, prefix: str = "", children_prefix: str = "", name: 
         res += (f"{obj}..." if name is None else f"{name}: {obj}...") + "\n"
         return res
 
-    res += (getType(obj) if name is None else f"{name}: {getType(obj)}") + "\n"
+    res += (get_type_name(obj) if name is None else f"{name}: {get_type_name(obj)}") + "\n"
     depth -= 1
     seen.add(id(obj))
     for i, (varName, val) in enumerate(attributes.items()):

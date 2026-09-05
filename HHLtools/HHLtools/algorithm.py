@@ -1,6 +1,6 @@
 from typing import TypeVar, Sequence
 from .error import raise_error
-from .utils import getType
+from .utils import get_type_name
 
 T = TypeVar("T")
 
@@ -15,7 +15,7 @@ def binary_search(seq: Sequence[T], target: T) -> int:
     :return: The index of the target, or -1 if target is not Found
     """
     if not isinstance(seq, Sequence):
-        raise_error(TypeError, f"{getType(seq)} object is not a Sequence")
+        raise_error(TypeError, f"{get_type_name(seq)} object is not a Sequence")
     highIndex = len(seq) - 1
     lowIndex = 0
     while lowIndex <= highIndex:

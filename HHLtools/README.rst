@@ -43,4 +43,7 @@ HHLTools
 2026/9/4
     | 2.0.0 COMPLETELY UPGRADED! Added some debug tools and documentations/annoations
     | 2.0.1 Fixed minor bugs
+    | 2.0.2 print_obj could detect infinite recursion
 
+2026/9/5
+    | 2.1.0 Support CAIE Array, a annoying data structure for 9618 CS students

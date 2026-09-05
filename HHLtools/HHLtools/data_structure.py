@@ -1,6 +1,9 @@
-from typing import List, Iterable, Any
-from .error import *
-from .utils import getType
+from typing import Any, Generic, TypeVar, cast, Self
+from math import prod
+from .error import raise_error, DimensionError, UninitializedError
+from .utils import get_type_name
+
+T = TypeVar("T")
 
 
 class Queue:
@@ -35,10 +38,10 @@ class Queue:
 
     def __eq__(self, other: "Queue"):
         if not isinstance(other, Queue):
-            raise_error(TypeError, f"Unsupported operand type(s) for =: Queue and {getType(other)}")
+            raise_error(TypeError, f"Unsupported operand type(s) for =: Queue and {get_type_name(other)}")
         return self.toList() == other.toList()
 
-    def toList(self) -> List[Any]:
+    def toList(self) -> list[Any]:
         """
         Convert the queue to a ``list``
         :return: the list
@@ -139,10 +142,10 @@ class Stack:
 
     def __eq__(self, other: "Stack"):
         if not isinstance(other, Stack):
-            raise_error(TypeError, f"Unsupported operand type(s) for =: Stack and {getType(other)}")
+            raise_error(TypeError, f"Unsupported operand type(s) for =: Stack and {get_type_name(other)}")
         return self.toList() == other.toList()
 
-    def toList(self) -> List[Any]:
+    def toList(self) -> list[Any]:
         """
         Convert the stack to a ``list``
         :return: the list
@@ -217,7 +220,7 @@ class LinkedListNode:
 
     def __eq__(self, other: "LinkedListNode"):
         if not isinstance(other, LinkedListNode):
-            raise_error(TypeError, f"Unsupported operand type(s) for =: LinkedListNode and {getType(other)}")
+            raise_error(TypeError, f"Unsupported operand type(s) for =: LinkedListNode and {get_type_name(other)}")
         return self.toList() == other.toList()
 
     def __add__(self, other: "LinkedListNode"):
@@ -227,14 +230,22 @@ class LinkedListNode:
         :return:
         """
         if not isinstance(other, LinkedListNode):
-            raise_error(TypeError, f"unsupported operand type(s) for +: 'LinkedListNode' and {getType(other)}")
+            raise_error(TypeError, f"unsupported operand type(s) for +: 'LinkedListNode' and {get_type_name(other)}")
         temp = self
+        result = LinkedListNode(self.val)
+        cur = result
         while temp.next is not None:
             temp = temp.next
-        temp.next = other
-        return self
+            cur.next = LinkedListNode(temp.val)
+            cur = cur.next
+        temp = other
+        while temp is not None:
+            cur.next = LinkedListNode(temp.val)
+            cur = cur.next
+            temp = temp.next
+        return result
 
-    def toList(self) -> List[Any]:
+    def toList(self) -> list[Any]:
         """
         Convert the linked list into a ``list``
         :return: the list
@@ -247,14 +258,104 @@ class LinkedListNode:
         return content
 
 
-def create_linkedlist_from_list(lst: List[Any]) -> LinkedListNode:
+class ArrayMeta(type):
+    def __call__(cls, *args, **kwargs):
+        raise_error(TypeError, "use Array[<lower1>:<upper1>, <lower2>:<upper2>, ...] @ type to create an array")
+
+    def __matmul__(cls, data_type: type[T]) -> "Array[T]":
+        array_cls = cast("type[Array[T]]", cls)
+        # noinspection PyProtectedMember
+        return array_cls._create(data_type)
+
+
+class Array(Generic[T], metaclass=ArrayMeta):
+    __UNSET = object()
+    _dimensions: list[tuple[int, int]] | None = None
+    __type: type
+    __array: list[T]
+    __dimensions: list[tuple[int, int]]
+
+    @classmethod
+    def _create(cls, data_type: type[T]) -> "Array[T]":
+        """
+        create an array of type ``data_type`` with given dimensions
+        :param data_type: The type of elements in the array
+        """
+        if cls._dimensions is None:
+            raise_error(UninitializedError, "Array must be initialized with its upper bounds and lower bounds", level=1)
+        if not isinstance(data_type, type):
+            raise_error(ValueError, f"element_type expects a type, got {get_type_name(data_type)} instead", level=1)
+        obj = object.__new__(cls)
+        obj.__type = data_type
+        obj.__array = [cls.__UNSET] * prod([d[1] - d[0] + 1 for d in cls._dimensions])
+        obj.__dimensions = cls._dimensions
+
+        return obj
+
+    def __getitem__(self, indices: int | tuple[int, ...]) -> T:
+        if not isinstance(indices, tuple):
+            indices = (indices,)
+        exact_index = self.__get_exact_index(indices)
+        if self.__array[exact_index] is self.__UNSET:
+            raise_error(UninitializedError, f"Array element at index {list(indices)} is not initialized")
+        return self.__array[exact_index]
+
+    def __setitem__(self, indices: int | tuple[int, ...], value: T):
+        if not isinstance(indices, tuple):
+            indices = (indices,)
+        exact_index = self.__get_exact_index(indices)
+        if not isinstance(value, self.__type):
+            raise_error(TypeError, f"Value of type {self.__type.__name__} expected, got {get_type_name(value)} instead")
+        self.__array[exact_index] = value
+
+    def __get_exact_index(self, indices: tuple[int, ...]) -> int:
+        if len(indices) != len(self.__dimensions):
+            raise_error(DimensionError, f"{len(self.__dimensions)} indices expected, got {len(indices)} instead",
+                        level=1)
+        exact_index = 0
+        for i, index in enumerate(list(indices)):
+            cur_dim = self.__dimensions[i]
+            if not isinstance(index, int):
+                raise_error(TypeError, f"Integer indices expected, got {get_type_name(index)} instead", level=1)
+            if not cur_dim[0] <= index <= cur_dim[1]:
+                raise_error(IndexError, f"Invalid index, an integer between {cur_dim[0]} and {cur_dim[1]} expected",
+                            level=1)
+            exact_index = exact_index * (cur_dim[1] - cur_dim[0] + 1) + (index - cur_dim[0])
+        return exact_index
+
+    def __class_getitem__(cls, indices: slice | tuple[slice, ...]) -> type[Self]:
+        if not isinstance(indices, tuple):
+            indices = (indices,)
+        if any(not isinstance(index, slice) for index in indices):
+            raise_error(TypeError, "Expected form [<lower1>:<upper1>, <lower2>:<upper2>, ...] with <lower i> and "
+                                   "<upper i> are integers")
+        dimensions = [(index.start, index.stop) for index in indices]
+        if len(dimensions) == 0:
+            raise_error(DimensionError, "No Dimensions given")
+        if any(not isinstance(d, tuple) or len(d) != 2 or not isinstance(d[0], int) or not isinstance(d[1], int)
+               or d[0] >= d[1] for d in dimensions):
+            raise_error(DimensionError, "Dimensions must be in the form (a, b) with a, b are integers and a < b")
+        dimensions_str_list = list(map(lambda index: f"{index[0]}:{index[1]}", dimensions))
+        dimensions_str = f"[{', '.join(dimensions_str_list)}]"
+        return type(
+            f"{cls.__name__}{dimensions_str}",
+            (cls,),
+            {f"_dimensions": dimensions, "__module__": cls.__module__}
+        )
+
+    @property
+    def dimensions(self):
+        return self.__dimensions
+
+
+def create_linkedlist_from_list(lst: list[Any]) -> LinkedListNode:
     """
     create a linked list from a non-empty ``list``
     :param lst: The list
     :return: The linked list
     """
-    if not isinstance(lst, Iterable):
-        raise_error(TypeError, f"{getType(lst)} object is not iterable")
+    if not isinstance(lst, list):
+        raise_error(TypeError, f"{get_type_name(lst)} object is not a list")
     if len(lst) == 0:
         raise_error(IndexError, f"Creating an empty linked list is unsupported now")
     node = LinkedListNode(lst[0])
@@ -265,15 +366,15 @@ def create_linkedlist_from_list(lst: List[Any]) -> LinkedListNode:
     return node
 
 
-def create_stack_from_list(lst: list, Fixedlength: bool = True) -> Stack:
+def create_stack_from_list(lst: list[Any], Fixedlength: bool = True) -> Stack:
     """
     create a stack from a ``list``
     :param Fixedlength: Indicate if the stack has a fixed length
     :param lst: The list
     :return: The stack
     """
-    if not isinstance(lst, Iterable):
-        raise_error(TypeError, f"{getType(lst)} object is not iterable")
+    if not isinstance(lst, list):
+        raise_error(TypeError, f"{get_type_name(lst)} object is not a list")
 
     if Fixedlength:
         stack = Stack(len(lst))
@@ -284,15 +385,15 @@ def create_stack_from_list(lst: list, Fixedlength: bool = True) -> Stack:
     return stack
 
 
-def create_queue_from_list(lst: list, Fixedlength: bool = True):
+def create_queue_from_list(lst: list[Any], Fixedlength: bool = True):
     """
     create a queue from a ``list``
     :param Fixedlength: Indicate if the queue has a fixed length
     :param lst: The list
     :return: The queue
     """
-    if not isinstance(lst, Iterable):
-        raise_error(TypeError, f"{getType(lst)} object is not iterable")
+    if not isinstance(lst, list):
+        raise_error(TypeError, f"{get_type_name(lst)} object is not a list")
 
     if Fixedlength:
         queue = Queue(len(lst))
