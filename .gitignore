@@ -1,8 +1,16 @@
-.idea/
+# build folders
 build/
 dist/
 *.egg-info/
+
+# macOS
 .DS_STORE
+
+# PyCharm
+.idea/
+
 __pycache__/
 .env
+
+# tests
 test/
