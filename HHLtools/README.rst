@@ -46,4 +46,5 @@ HHLTools
     | 2.0.2 print_obj could detect infinite recursion
 
 2026/9/5
-    | 2.1.0 Support CAIE Array, a annoying data structure for 9618 CS students
+    | 2.1.0 implemented Array
+    | 2.1.1 some refactoring

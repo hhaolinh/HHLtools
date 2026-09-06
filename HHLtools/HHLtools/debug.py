@@ -70,28 +70,28 @@ def print_obj(obj: object, depth: int | None = None) -> None:
     if depth <= 0:
         print(obj)
         return
-    print(_format_obj(obj, depth=depth).removesuffix("\n"))
+    print("\n".join(_format_obj(obj, depth=depth)))
 
 
 def _format_obj(obj: object, prefix: str = "", children_prefix: str = "", name: str | None = None,
-                depth: int = 0, seen: set[str] = None) -> str:
+                depth: int = 0, seen: set[str] = None) -> list[str]:
     if seen is None:
         seen = set()
-    res = prefix
-    attributes = _getattrs(obj)
-    if attributes is None or not attributes:
-        res += (repr(obj) if name is None else f"{name} = {obj!r}") + "\n"
+    res = [prefix]
+    attributes = _get_attrs(obj)
+    if not attributes:
+        res[0] += repr(obj) if name is None else f"{name} = {obj!r}"
         return res
 
     if id(obj) in seen:
-        res += (f"{TreeConnectors.RECURSION}{obj}" if name is None else f"{TreeConnectors.RECURSION}{name}: {obj}") + "\n"
+        res[0] += f"{TreeConnectors.RECURSION}{obj}" if name is None else f"{TreeConnectors.RECURSION}{name}: {obj}"
         return res
 
     if depth == 0:
-        res += (f"{obj}..." if name is None else f"{name}: {obj}...") + "\n"
+        res[0] += f"{obj}..." if name is None else f"{name}: {obj}..."
         return res
 
-    res += (get_type_name(obj) if name is None else f"{name}: {get_type_name(obj)}") + "\n"
+    res[0] += get_type_name(obj) if name is None else f"{name}: {get_type_name(obj)}"
     depth -= 1
     seen.add(id(obj))
     for i, (varName, val) in enumerate(attributes.items()):
@@ -102,11 +102,24 @@ def _format_obj(obj: object, prefix: str = "", children_prefix: str = "", name: 
     seen.remove(id(obj))
     return res
 
-def _getattrs(obj: object) -> dict[str, Any] | None:
+
+def _get_attrs(obj: object) -> dict[str, Any]:
+    attributes = {}
+    mro = type(obj).__mro__
+    for cls in mro[:-1]:
+        if hasattr(cls, "__slots__"):
+            slots = cls.__slots__
+            if not isinstance(slots, tuple):
+                slots = (slots,)
+            for key in slots:
+                try:
+                    attributes[key] = getattr(obj, key)
+                except AttributeError:
+                    pass
     if hasattr(obj, "__dict__"):
-        attributes = vars(obj)
-    elif isinstance(obj, list):
+        for key, val in obj.__dict__.items():
+            attributes[key] = val
+    if isinstance(obj, list):
         attributes = dict((f"[{i}]", obj[i]) for i in range(len(obj)))
-    else:
-        attributes = None
+
     return attributes

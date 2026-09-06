@@ -1,6 +1,6 @@
-from typing import Any, Generic, TypeVar, cast, Self
+from typing import Any, Generic, TypeVar, cast
 from math import prod
-from .error import raise_error, DimensionError, UninitializedError
+from .error import raise_error, DimensionError, UninitializedError, UNSET
 from .utils import get_type_name
 
 T = TypeVar("T")
@@ -269,7 +269,6 @@ class ArrayMeta(type):
 
 
 class Array(Generic[T], metaclass=ArrayMeta):
-    __UNSET = object()
     _dimensions: list[tuple[int, int]] | None = None
     __type: type
     __array: list[T]
@@ -287,7 +286,7 @@ class Array(Generic[T], metaclass=ArrayMeta):
             raise_error(ValueError, f"element_type expects a type, got {get_type_name(data_type)} instead", level=1)
         obj = object.__new__(cls)
         obj.__type = data_type
-        obj.__array = [cls.__UNSET] * prod([d[1] - d[0] + 1 for d in cls._dimensions])
+        obj.__array = [UNSET] * prod([d[1] - d[0] + 1 for d in cls._dimensions])
         obj.__dimensions = cls._dimensions
 
         return obj
@@ -296,7 +295,7 @@ class Array(Generic[T], metaclass=ArrayMeta):
         if not isinstance(indices, tuple):
             indices = (indices,)
         exact_index = self.__get_exact_index(indices)
-        if self.__array[exact_index] is self.__UNSET:
+        if self.__array[exact_index] is UNSET:
             raise_error(UninitializedError, f"Array element at index {list(indices)} is not initialized")
         return self.__array[exact_index]
 
@@ -323,7 +322,7 @@ class Array(Generic[T], metaclass=ArrayMeta):
             exact_index = exact_index * (cur_dim[1] - cur_dim[0] + 1) + (index - cur_dim[0])
         return exact_index
 
-    def __class_getitem__(cls, indices: slice | tuple[slice, ...]) -> type[Self]:
+    def __class_getitem__(cls, indices: slice | tuple[slice, ...]):
         if not isinstance(indices, tuple):
             indices = (indices,)
         if any(not isinstance(index, slice) for index in indices):
@@ -346,6 +345,10 @@ class Array(Generic[T], metaclass=ArrayMeta):
     @property
     def dimensions(self):
         return self.__dimensions
+
+    @property
+    def type(self):
+        return self.__type
 
 
 def create_linkedlist_from_list(lst: list[Any]) -> LinkedListNode:
