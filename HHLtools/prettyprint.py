@@ -1,4 +1,9 @@
+"""Terminal formatting and tree-display constants."""
+
+
 class FontStyle:
+    """ANSI Select Graphic Rendition codes for font styles."""
+
     DEFAULT = 0
     BOLD = 1
     UNDERLINE = 4
@@ -7,6 +12,8 @@ class FontStyle:
 
 
 class FontColor:
+    """ANSI foreground-color codes."""
+
     BLACK = 30
     RED = 31
     GREEN = 32
@@ -18,6 +25,8 @@ class FontColor:
 
 
 class BackgroundColor:
+    """ANSI background-color codes."""
+
     DEFAULT = 0
     BLACK = 40
     RED = 41
@@ -30,6 +39,8 @@ class BackgroundColor:
 
 
 class TreeConnectors:
+    """Unicode connectors used to render tree-shaped output."""
+
     LONG = "├── "
     SHORT = "└── "
     STRAIGHT = "│   "
@@ -38,6 +49,20 @@ class TreeConnectors:
 
 
 def prints(content, *args, fontStyle=None, fontColor=None, backgroundColor=None, **kwargs):
+    """Print content with optional ANSI terminal formatting.
+
+    Positional and keyword arguments not used for styling are forwarded to
+    :func:`print`.
+
+    :param content: Value to print.
+    :param args: Additional positional arguments forwarded to :func:`print`.
+    :param fontStyle: ANSI font-style code, such as :attr:`FontStyle.BOLD`.
+    :param fontColor: ANSI foreground-color code, such as
+        :attr:`FontColor.RED`.
+    :param backgroundColor: ANSI background-color code, such as
+        :attr:`BackgroundColor.BLUE`.
+    :param kwargs: Additional keyword arguments forwarded to :func:`print`.
+    """
     codes = []
     if fontStyle is not None and fontStyle != 0:
         codes.append(str(fontStyle))

@@ -1,3 +1,5 @@
+"""General-purpose algorithms."""
+
 from typing import TypeVar, Sequence
 from .error import raise_error
 from .utils import get_type_name
@@ -6,13 +8,14 @@ T = TypeVar("T")
 
 
 def binary_search(seq: Sequence[T], target: T) -> int:
-    """
-    Find an occurrence of a target in a sorted sequence using binary search.
-    The sequence must be sorted in ascending order, and its elements must be mutually comparable with the target.
+    """Find ``target`` in an ascending, sorted sequence.
 
-    :param seq: The sorted sequence to search
-    :param target: The value to search for
-    :return: The index of the target, or -1 if target is not Found
+    The sequence's elements must be comparable with ``target``. If the target
+    occurs more than once, the index of any matching element may be returned.
+
+    :param seq: The sorted sequence to search.
+    :param target: The value to search for.
+    :return: The target's index, or ``-1`` if it is not present.
     """
     if not isinstance(seq, Sequence):
         raise_error(TypeError, f"{get_type_name(seq)} object is not a Sequence")

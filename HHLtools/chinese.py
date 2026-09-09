@@ -1,3 +1,9 @@
+"""Chinese aliases for selected Python built-ins and constants.
+
+This module is intended as a playful language-learning convenience. Importing
+it does not alter Python's syntax or built-in namespace.
+"""
+
 真 = True
 假 = False
 输出 = print

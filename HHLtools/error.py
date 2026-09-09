@@ -1,3 +1,5 @@
+"""Exception-reporting helpers and package-specific exception types."""
+
 import inspect
 import sys
 import traceback
@@ -6,23 +8,23 @@ from typing import NoReturn
 
 
 def raise_error(err: type[Exception] | Exception, *args, level: int = 0, exit_code: int = 1) -> NoReturn:
-    """
-    Raise an exception while hiding the raising function from the traceback.
-    :param err: The exception type to raise
-    :param args: Arguments passed to the exception constructor
-    :param level: The number of extra frames to be removed in the calling stack
-    :param exit_code: The exit code of the program
+    """Print an exception with a shortened traceback, then exit the program.
+
+    :param err: An exception instance or exception class to report.
+    :param args: Arguments passed to ``err`` when it is an exception class.
+    :param level: Number of additional caller frames to omit.
+    :param exit_code: Process exit code passed to :func:`sys.exit`.
     """
     print_error(err, *args, level)
     sys.exit(exit_code)
 
 
 def print_error(err: type[Exception] | Exception, *args, level: int = 0) -> None:
-    """
-    print an exception while hiding the raising function from the traceback.
-    :param err: The exception type to raise
-    :param args: Arguments passed to the exception constructor
-    :param level: The number of extra frames to be removed in the calling stack
+    """Print an exception with internal frames omitted from its traceback.
+
+    :param err: An exception instance or exception class to report.
+    :param args: Arguments passed to ``err`` when it is an exception class.
+    :param level: Number of additional caller frames to omit.
     """
     try:
         if isinstance(err, Exception):
@@ -51,16 +53,12 @@ def print_error(err: type[Exception] | Exception, *args, level: int = 0) -> None
 
 
 class DimensionError(Exception):
-    """
-    Error caused by unaccepted dimensions for objects with dimensions
-    """
+    """Indicate that an object has invalid or incompatible dimensions."""
     __module__ = "builtins"
 
 
 class UninitializedError(ValueError):
-    """
-    Error caused by accessing an uninitialized item
-    """
+    """Indicate an attempt to access an uninitialized value."""
     __module__ = "builtins"
 
 

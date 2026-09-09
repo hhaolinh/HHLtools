@@ -1,3 +1,5 @@
+"""Utilities for inspecting calls and object state."""
+
 import inspect
 import traceback
 from functools import wraps
@@ -12,10 +14,15 @@ R = TypeVar("R")
 
 
 def calling_stack(depth: int = None):
-    """
-    Display the calling stack whenever the decorated function is called
-    :param depth: Maximum depth of the stack
-    :return: The decorated function
+    """Print the call stack after each successful call to a function.
+
+    This decorator can be used either as ``@calling_stack`` or as
+    ``@calling_stack(depth)``. A negative depth is treated as unlimited.
+
+    :param depth: Maximum number of stack frames to print. If omitted, print
+        all available frames.
+    :return: A decorator, or the decorated function when used without
+        parentheses.
     """
     if isinstance(depth, Callable):
         return calling_stack()(depth)
@@ -59,11 +66,13 @@ def _print_debug_message(message: str) -> None:
 
 
 def print_obj(obj: object, depth: int | None = None) -> None:
-    """
-    Print an object in tree-style
-    :param obj: The object to be printed
-    :param depth: Maximum depth of expansion
-    :return:
+    """Print an object's attributes as a tree.
+
+    Recursive references are marked rather than expanded again.
+
+    :param obj: The object to print.
+    :param depth: Maximum expansion depth. If omitted, use Python's recursion
+        limit.
     """
     if depth is None:
         depth = getrecursionlimit()

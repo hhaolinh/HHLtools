@@ -1,14 +1,20 @@
+"""Small helpers for functions, vectors, and lines."""
+
 from .error import raise_error, DimensionError
 from .utils import get_type_name
 
 
 class Function:
+    """Represent a real-valued function of one variable.
+
+    :param expression: Python expression used to evaluate the function.
+    :param variable: Variable name to substitute in ``expression``.
+
+    .. warning::
+       Expressions are evaluated with :func:`eval`. Do not use untrusted input.
+    """
+
     def __init__(self, expression: str, variable: str):
-        """
-        A single-variable function
-        :param expression: The expression of the function
-        :param variable: The name of the variable
-        """
         if type(expression) is not str:
             raise_error(TypeError, f"the expression must be a string, not {get_type_name(expression)}")
         if type(variable) is not str:
@@ -17,10 +23,10 @@ class Function:
         self.__var = variable
 
     def evaluate(self, value: int | float) -> int | float:
-        """
-        Evaluate the function with a given value for the variable
-        :param value: The value to be assigned to the variable
-        :return: THe result
+        """Evaluate the function at a given value.
+
+        :param value: Value to substitute for the function's variable.
+        :return: The evaluated result.
         """
         if type(value) not in (int, float):
             raise_error(TypeError, f"the value must be an integer, or a real number, not {get_type_name(value)}")
@@ -28,11 +34,15 @@ class Function:
         return eval(expression)
 
     def gradient(self, accuracy: float, value: int | float) -> float:
-        """
-        Calculate the gradient of the function at a given point with given accuracy
-        :param accuracy:
-        :param value:
-        :return:
+        """Approximate the function's gradient at a point.
+
+        The implementation uses a forward finite difference with a step of
+        ``10 ** -accuracy``.
+
+        :param accuracy: Exponent controlling the finite-difference step.
+        :param value: Point at which to approximate the gradient.
+        :return: The approximated gradient, rounded to one or three decimal
+            places.
         """
         if type(value) not in (int, float):
             raise_error(TypeError, f"the value must be an integer, or a real number, not {get_type_name(value)}")
@@ -47,11 +57,13 @@ class Function:
 
 
 class Vector:
+    """Represent a two- or three-dimensional vector.
+
+    :param dimensions: Components in the ``i``, ``j``, and optional ``k``
+        directions.
+    """
+
     def __init__(self, dimensions: list):
-        """
-        only support two-dimensional and three-dimensional vectors
-        :param dimensions: the components of the vector in i, j(, k) directions
-        """
         if len(dimensions) != 2 and len(dimensions) != 3:
             raise_error(DimensionError, f'expected 2 or 3 dimensions, got {len(dimensions)}')
         self.dimensions = dimensions
@@ -118,15 +130,16 @@ class Vector:
 
 
 class Line:
+    """Represent a three-dimensional line in vector form.
+
+    :param position: Position vector of a point on the line.
+    :param direction: Direction vector of the line.
+    :param scalar: Unique symbol used for the line's scalar parameter.
+    """
+
     _chars = []
 
     def __init__(self, position: Vector, direction: Vector, scalar: str):
-        """
-        Vectorized straight line in 3D world
-        :param position:
-        :param direction:
-        :param scalar:
-        """
         if len(position) != 3:
             raise_error(DimensionError, f'expected 3 dimensions, got {len(position)}')
         if len(direction) != 3:

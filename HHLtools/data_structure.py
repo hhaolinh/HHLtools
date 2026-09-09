@@ -1,3 +1,5 @@
+"""Data structures and construction helpers."""
+
 from typing import Any, Generic, TypeVar, cast
 from math import prod
 from .error import raise_error, DimensionError, UninitializedError, UNSET
@@ -7,14 +9,13 @@ T = TypeVar("T")
 
 
 class Queue:
-    """
-    A LIFO data structure
+    """A first-in, first-out (FIFO) queue.
+
+    :param size: Maximum number of items. A non-positive value creates an
+        unbounded queue.
     """
 
     def __init__(self, size: int = -1):
-        """
-        :param size: the fixed size of the queue, infinite length if not set
-        """
         if size > 0:
             self.__size = size
             self.__queue = [None] * size
@@ -42,9 +43,9 @@ class Queue:
         return self.toList() == other.toList()
 
     def toList(self) -> list[Any]:
-        """
-        Convert the queue to a ``list``
-        :return: the list
+        """Return the queue's contents in removal order.
+
+        :return: A new list containing the queued items.
         """
         contents = []
         if self.__size == -1:
@@ -60,10 +61,7 @@ class Queue:
         return contents
 
     def show(self) -> None:
-        """
-        Show the queue
-        :return:
-        """
+        """Print the queue and its head and tail pointers."""
         contents = self.__queue
         maxlen = 0
         for c in contents:
@@ -81,10 +79,9 @@ class Queue:
         print('=' * (15 + maxlen + 15))
 
     def push(self, content: Any) -> None:
-        """
-        Push an element to the tail of the queue, raise ``IndexError`` if the queue is full
-        :param content: The element to be pushed
-        :return:
+        """Add an item to the tail of the queue.
+
+        :param content: The item to add.
         """
         if self.__size > 0:
             if self.__count == self.__size:
@@ -96,9 +93,9 @@ class Queue:
             self.__queue.append(content)
 
     def pop(self) -> Any:
-        """
-        Get and remove the element from the head of the queue, raise ``IndexError`` if the queue is empty
-        :return: The element being popped
+        """Remove and return the item at the head of the queue.
+
+        :return: The oldest queued item, or ``None`` if the queue is empty.
         """
         if self.__size > 0:
             if self.__count == 0:
@@ -117,11 +114,13 @@ class Queue:
 
 
 class Stack:
+    """A last-in, first-out (LIFO) stack.
+
+    :param size: Maximum number of items. A non-positive value creates an
+        unbounded stack.
+    """
+
     def __init__(self, size: int = -1):
-        """
-        A LIFO data structure
-        :param size: the fixed size of the stack, if not set, infinite length
-        """
         self.a = 0
         if size > 0:
             self.__stack = [None] * size
@@ -146,9 +145,9 @@ class Stack:
         return self.toList() == other.toList()
 
     def toList(self) -> list[Any]:
-        """
-        Convert the stack to a ``list``
-        :return: the list
+        """Return the stack's contents as a list.
+
+        :return: A new list containing the stack's items.
         """
         contents = []
         if self.__size == -1:
@@ -159,10 +158,9 @@ class Stack:
         return contents
 
     def push(self, content: Any) -> None:
-        """
-        Push an element to the top of the stack, raise ``IndexError`` if the queue is full
-        :param content: The element to be pushed
-        :return:
+        """Add an item to the top of the stack.
+
+        :param content: The item to add.
         """
         if self.__size > 0:
             if self.__top < self.__size - 1:
@@ -174,9 +172,10 @@ class Stack:
             self.__stack.insert(0, content)
 
     def pop(self) -> Any:
-        """
-        Get and remove an element from the top of the stack, raise ``IndexError`` if the queue is full
-        :return: The element being popped
+        """Remove and return the item at the top of the stack.
+
+        :return: The most recently pushed item, or ``None`` if the stack is
+            empty.
         """
         if self.__size > 0:
             if self.__top > -1:
@@ -194,11 +193,12 @@ class Stack:
 
 
 class LinkedListNode:
+    """A node that also represents the head of a singly linked list.
+
+    :param val: Value stored in the node.
+    """
+
     def __init__(self, val):
-        """
-        A node of a Linked list
-        :param val: the value inside the node
-        """
         self.val = val
         self.next = None
 
@@ -224,10 +224,10 @@ class LinkedListNode:
         return self.toList() == other.toList()
 
     def __add__(self, other: "LinkedListNode"):
-        """
-        Concatenate two Linked lists Together
-        :param other:
-        :return:
+        """Return a copy of this list followed by ``other``.
+
+        :param other: Head node of the list to append.
+        :return: Head node of the concatenated list.
         """
         if not isinstance(other, LinkedListNode):
             raise_error(TypeError, f"unsupported operand type(s) for +: 'LinkedListNode' and {get_type_name(other)}")
@@ -246,9 +246,9 @@ class LinkedListNode:
         return result
 
     def toList(self) -> list[Any]:
-        """
-        Convert the linked list into a ``list``
-        :return: the list
+        """Return the linked-list values as a list.
+
+        :return: A new list containing each node's value.
         """
         content = []
         temp = self
@@ -259,6 +259,8 @@ class LinkedListNode:
 
 
 class ArrayMeta(type):
+    """Metaclass implementing the bounds-and-type syntax for :class:`Array`."""
+
     def __call__(cls, *args, **kwargs):
         raise_error(TypeError, "use Array[<lower1>:<upper1>, <lower2>:<upper2>, ...] @ type to create an array")
 
@@ -269,6 +271,18 @@ class ArrayMeta(type):
 
 
 class Array(Generic[T], metaclass=ArrayMeta):
+    """A fixed-size, typed, multidimensional array with explicit bounds.
+
+    Create arrays with ``Array[lower:upper, ...] @ element_type``. Both bounds
+    are inclusive. Elements must be assigned before they are read.
+
+    Example::
+
+        matrix = Array[1:2, 1:3] @ int
+        matrix[1, 1] = 42
+
+    """
+
     _dimensions: list[tuple[int, int]] | None = None
     __type: type
     __array: list[T]
@@ -276,9 +290,10 @@ class Array(Generic[T], metaclass=ArrayMeta):
 
     @classmethod
     def _create(cls, data_type: type[T]) -> "Array[T]":
-        """
-        create an array of type ``data_type`` with given dimensions
-        :param data_type: The type of elements in the array
+        """Create an array with the bounds stored on this specialized class.
+
+        :param data_type: Required type for elements assigned to the array.
+        :return: A new, uninitialized array.
         """
         if cls._dimensions is None:
             raise_error(UninitializedError, "Array must be initialized with its upper bounds and lower bounds", level=1)
@@ -344,18 +359,20 @@ class Array(Generic[T], metaclass=ArrayMeta):
 
     @property
     def dimensions(self):
+        """Return the inclusive lower and upper bound of each dimension."""
         return self.__dimensions
 
     @property
     def type(self):
+        """Return the required element type."""
         return self.__type
 
 
 def create_linkedlist_from_list(lst: list[Any]) -> LinkedListNode:
-    """
-    create a linked list from a non-empty ``list``
-    :param lst: The list
-    :return: The linked list
+    """Create a linked list from a non-empty list.
+
+    :param lst: Values to store, in order.
+    :return: The head node of the linked list.
     """
     if not isinstance(lst, list):
         raise_error(TypeError, f"{get_type_name(lst)} object is not a list")
@@ -370,11 +387,12 @@ def create_linkedlist_from_list(lst: list[Any]) -> LinkedListNode:
 
 
 def create_stack_from_list(lst: list[Any], Fixedlength: bool = True) -> Stack:
-    """
-    create a stack from a ``list``
-    :param Fixedlength: Indicate if the stack has a fixed length
-    :param lst: The list
-    :return: The stack
+    """Create a stack populated from a list.
+
+    :param lst: Items to push, in iteration order.
+    :param Fixedlength: If ``True``, limit the stack's capacity to the input
+        length.
+    :return: The populated stack.
     """
     if not isinstance(lst, list):
         raise_error(TypeError, f"{get_type_name(lst)} object is not a list")
@@ -389,11 +407,12 @@ def create_stack_from_list(lst: list[Any], Fixedlength: bool = True) -> Stack:
 
 
 def create_queue_from_list(lst: list[Any], Fixedlength: bool = True):
-    """
-    create a queue from a ``list``
-    :param Fixedlength: Indicate if the queue has a fixed length
-    :param lst: The list
-    :return: The queue
+    """Create a queue populated from a list.
+
+    :param lst: Items to enqueue, in iteration order.
+    :param Fixedlength: If ``True``, limit the queue's capacity to the input
+        length.
+    :return: The populated queue.
     """
     if not isinstance(lst, list):
         raise_error(TypeError, f"{get_type_name(lst)} object is not a list")

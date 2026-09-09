@@ -1,31 +1,37 @@
+"""Internal helpers shared by the package's public modules."""
+
 from typing import Any
 from .error import raise_error, UNSET
 
 
 def get_type_name(obj: object) -> str:
-    """
-    Get the name of the type of the given object
-    :param obj:
-    :return:
+    """Return the name of an object's concrete type.
+
+    :param obj: The object to inspect.
+    :return: The unqualified name of ``type(obj)``.
     """
     return f"{type(obj).__name__}"
 
 
 def get_type_name_from_annotation(annotation: Any) -> str:
-    """
-    Get the type name from annotation
-    :param annotation:
-    :return:
+    """Return the name exposed by a type annotation.
+
+    :param annotation: An annotation with a ``__name__`` attribute.
+    :return: The annotation's name.
     """
     return annotation.__name__
 
 
 def check_type_from_annotation(annotation: Any, obj: object) -> bool | None:
-    """
-    Check the given object has the specified type
-    :param annotation: The annotation
-    :param obj: The object to be checked
-    :return: ``True`` if it passes the type check, ``False`` otherwise
+    """Check whether an object satisfies a supported type annotation.
+
+    ``typing.Any`` accepts every value. The ``UNSET`` sentinel is also accepted
+    for every annotation. Parameterized annotations are not yet supported.
+
+    :param annotation: The annotation against which to check the object.
+    :param obj: The object to check.
+    :return: ``True`` if the object matches, otherwise ``False``.
+    :raises NotImplementedError: If the annotation is unsupported.
     """
     if annotation is Any or obj is UNSET:
         return True
