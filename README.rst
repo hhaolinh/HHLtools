@@ -1,8 +1,32 @@
+.. image:: https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white
+   :alt: Python 3.10+
+
+.. image:: https://img.shields.io/badge/license-MIT-22c55e
+   :target: LICENSE.txt
+   :alt: MIT License
+
 HHLtools
 ========
 
 HHLtools is a small collection of Python utilities for algorithms, data
-structures, debugging, terminal output, and basic mathematics.
+structures, debugging, terminal output, and basic mathematics.**Small tools. Clear code. Less repetition.**
+
+`Install from PyPI <https://pypi.org/project/hhltools/>`_ |
+`Browse the source <HHLtools/>`_ |
+`Explore the tests <tests/>`_
+
+What is inside?
+---------------
+
+* **Algorithms** — binary search and general-purpose helpers.
+* **Data structures** — queues, stacks, linked lists, and typed
+  multidimensional arrays with explicit index bounds.
+* **Debugging** — inspect nested objects as trees and explore the call stack.
+* **Terminal output** — ANSI formatting and tree-display utilities.
+* **Mathematics** — functions, vectors, and 3D lines.
+* **Chinese aliases** — selected Python built-ins and constants.
+
+
 
 Requirements
 ------------
