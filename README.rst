@@ -8,8 +8,9 @@
 HHLtools
 ========
 
-HHLtools is a small collection of Python utilities for algorithms, data
-structures, debugging, terminal output, and basic mathematics.**Small tools. Clear code. Less repetition.**
+HHLtools is a small collection of Python utilities for algorithms, datastructures, debugging, terminal output, and basic mathematics.
+
+**Small tools. Clear code. Less repetition.**
 
 `Install from PyPI <https://pypi.org/project/hhltools/>`_ |
 `Browse the source <HHLtools/>`_ |
